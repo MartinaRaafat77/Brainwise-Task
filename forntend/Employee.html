@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Employee Management System</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <header>
+        <h1>Employee Management System</h1>
+        <nav>
+            <a href="company.html">Company</a>
+            <a href="department.html">Department</a>
+            <a href="employee.html">Employees</a>
+            <a href="Projects.html">Projects</a>
+            <a href="#" id="logout-button">Logout</a>
+
+        </nav>
+    </header>
+
+    <div class="form-container">
+        <h2>Add New Employee</h2>
+        <form id="employee-form">
+            <input type="text" id="employee_name" placeholder="Employee Name" required>
+            <input type="email" id="email" placeholder="Email" required>
+            <input type="text" id="mobile_number" placeholder="Mobile Number" required>
+            <input type="text" id="address" placeholder="Address" required>
+            <input type="text" id="position" placeholder="Position" required>
+            <input type="date" id="hired_on" required>
+            <input type="text" id="company_name" placeholder="Company Name" required>
+            <input type="text" id="department_name" placeholder="Department Name" required>
+            <input type="password" id="password" placeholder="Password" required>
+            <button type="submit">Add Employee</button>
+        </form>
+    </div>
+
+    <div class="search-container">
+        <h2>Search Employees</h2>
+        <input type="text" id="search-employee-name" placeholder="Search by Employee Name">
+        <button id="search-employee-button">Search</button>
+    </div>
+
+    <h2>Employee List</h2>
+    <table id="employee-table">
+        <thead>
+            <tr>
+                <th>Employee Name</th>
+                <th>Email</th>
+                <th>Mobile Number</th>
+                <th>Address</th>
+                <th>Position</th>
+                <th>Hired On</th>
+                <th>Company Name</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody id="employee-list"></tbody>
+    </table>
+
+    <div class="update-form-container" id="update-employee-form-container">
+        <h2>Update Employee</h2>
+        <form id="update-employee-form">
+            <input type="text" id="update_employee_name" placeholder="Employee Name" required>
+            <input type="email" id="update_email" placeholder="Email" required>
+            <input type="text" id="update_mobile_number" placeholder="Mobile Number" required>
+            <input type="text" id="update_address" placeholder="Address" required>
+            <input type="text" id="update_position" placeholder="Position" required>
+            <input type="date" id="update_hired_on" required>
+            <input type="text" id="update_company_name" placeholder="Company Name" required>
+            <button type="submit">Update Employee</button>
+        </form>
+    </div>
+
+    <script>
+        const API_URL = 'http://localhost:5000/api/employee'; 
+        let currentEmployeeId = null;
+
+        // Add employee
+        document.getElementById('employee-form').addEventListener('submit', function(event) {
+            event.preventDefault();
+
+            const employeeData = {
+                employee_name: document.getElementById('employee_name').value,
+                email: document.getElementById('email').value,
+                mobile_number: document.getElementById('mobile_number').value,
+                address: document.getElementById('address').value,
+                position: document.getElementById('position').value,
+                hired_on: document.getElementById('hired_on').value,
+                company_name: document.getElementById('company_name').value,
+                department_name: document.getElementById('department_name').value,
+                password: document.getElementById('password').value
+            };
+
+            fetch(API_URL, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(employeeData)
+            })
+            .then(response => response.json())
+            .then(data => {
+                alert(data.message);
+                loadEmployees();
+            })
+            .catch(error => console.error('Error:', error));
+        });
+
+        // Search employees
+        document.getElementById('search-employee-button').addEventListener('click', function() {
+            const employeeName = document.getElementById('search-employee-name').value;
+            const searchUrl = employeeName ? `${API_URL}?employee_name=${employeeName}` : API_URL;
+
+            fetch(searchUrl)
+                .then(response => response.json())
+                .then(employees => displayEmployees(employees))
+                .catch(error => console.error('Error:', error));
+        });
+
+        function loadEmployees() {
+            fetch(API_URL)
+                .then(response => response.json())
+                .then(employees => displayEmployees(employees))
+                .catch(error => console.error('Error:', error));
+        }
+
+        function displayEmployees(employees) {
+            const employeeList = document.getElementById('employee-list');
+            employeeList.innerHTML = '';
+            employees.forEach(employee => {
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td>${employee.employee_name}</td>
+                    <td>${employee.email_address}</td>
+                    <td>${employee.mobile_number}</td>
+                    <td>${employee.address}</td>
+                    <td>${employee.designation}</td>
+                    <td>${employee.hired_on}</td>
+                    <td>${employee.company_name}</td>
+                    <td>
+                        <button onclick="deleteEmployee(${employee.employee_id})">Delete</button>
+                        <button onclick="editEmployee(${employee.employee_id})">Edit</button>
+                    </td>
+                `;
+                employeeList.appendChild(tr);
+            });
+        }
+
+        // Delete employee
+        function deleteEmployee(id) {
+            fetch(`${API_URL}/${id}`, {
+                method: 'DELETE',
+            })
+            .then(response => response.json())
+            .then(data => {
+                alert(data.message);
+                loadEmployees();
+            })
+            .catch(error => console.error('Error:', error));
+        }
+
+        // Edit employee
+        function editEmployee(id) {
+            fetch(`${API_URL}/${id}`)
+                .then(response => response.json())
+                .then(employee => {
+                    document.getElementById('update_employee_name').value = employee.employee_name;
+                    document.getElementById('update_email').value = employee.email_address;
+                    document.getElementById('update_mobile_number').value = employee.mobile_number;
+                    document.getElementById('update_address').value = employee.address;
+                    document.getElementById('update_position').value = employee.designation;
+                    document.getElementById('update_hired_on').value = employee.hired_on;
+                    document.getElementById('update_company_name').value = employee.company_name;
+
+                    currentEmployeeId = id;
+                    document.getElementById('update-employee-form-container').style.display = 'block';
+                })
+                .catch(error => console.error('Error:', error));
+        }
+
+        // Update employee
+        document.getElementById('update-employee-form').addEventListener('submit', function(event) {
+            event.preventDefault();
+
+            const updatedData = {
+                employee_name: document.getElementById('update_employee_name').value,
+                email: document.getElementById('update_email').value,
+                mobile_number: document.getElementById('update_mobile_number').value,
+                address: document.getElementById('update_address').value,
+                position: document.getElementById('update_position').value,
+                hired_on: document.getElementById('update_hired_on').value,
+                company_name: document.getElementById('update_company_name').value
+            };
+
+            fetch(`${API_URL}/${currentEmployeeId}`, {
+                method: 'PATCH',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(updatedData)
+            })
+            .then(response => response.json())
+            .then(data => {
+                alert(data.message);
+                loadEmployees();
+                document.getElementById('update-employee-form-container').style.display = 'none';
+            })
+            .catch(error => console.error('Error:', error));
+        });
+
+        
+        window.onload = loadEmployees;
+        
+document.getElementById('logout-button').addEventListener('click', function(event) {
+    event.preventDefault(); 
+    
+    
+    localStorage.clear(); 
+    sessionStorage.clear();
+
+    
+    window.location.href = 'login.html'; 
+});
+
+    </script>
+</body>
+</html>

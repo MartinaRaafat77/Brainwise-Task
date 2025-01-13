@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Company Management</title>
+    <link rel="stylesheet" href="styles.css">
+    <script>
+        window.onload = function() {
+            
+            document.getElementById('welcomeMessage').textContent = 'Welcome to Company Management';
+        };
+
+        // all companies
+        function fetchAllCompanies() {
+            fetch('http://localhost:5000/api/companies')
+                .then(response => response.json())
+                .then(data => {
+                    const companyList = document.getElementById('CompanyList');
+                    companyList.innerHTML = '';
+
+                    data.forEach(company => {
+                        const tr = document.createElement('tr');
+                        tr.innerHTML = ` 
+                            <td>${company.company_name}</td>
+                            <td>${company.no_ofdept}</td>
+                            <td>${company.no_ofemp}</td>
+                            <td>${company.no_ofproj}</td>
+                            <td>${company.created_at}</td>
+                        `;
+                        companyList.appendChild(tr);
+                    });
+                })
+                .catch(error => {
+                    console.error('Error fetching companies:', error);
+                    alert('Error fetching companies. Please try again.');
+                });
+        }
+
+        // Search company name
+        function fetchCompanyByName() {
+            const companyName = document.getElementById('search_company_name').value.trim();
+
+            if (!companyName) {
+                alert('Please enter a company name.');
+                return;
+            }
+
+            fetch(`http://localhost:5000/api/companies?company_name=${encodeURIComponent(companyName)}`)
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Company not found');
+                    }
+                    return response.json();
+                })
+                .then(companies => {
+                    const companyTableBody = document.getElementById('company_table_body');
+                    companyTableBody.innerHTML = '';
+
+                    if (companies.length === 0) {
+                        alert('No companies found with the given name.');
+                        return;
+                    }
+
+                    companies.forEach(company => {
+                        const tr = document.createElement('tr');
+                        tr.innerHTML = `
+                            <td>${company.company_name}</td>
+                            <td>${company.no_ofdept}</td>
+                            <td>${company.no_ofemp}</td>
+                            <td>${company.no_ofproj}</td>
+                            <td>${company.created_at}</td>
+                        `;
+                        companyTableBody.appendChild(tr);
+                    });
+                })
+                .catch(error => {
+                    console.error('Error fetching company:', error);
+                    alert('Error fetching company: ' + error.message);
+                });
+        }
+
+      
+        document.getElementById('logout-button').addEventListener('click', function(event) {
+    event.preventDefault(); 
+    
+    
+    localStorage.clear(); 
+    sessionStorage.clear();
+
+    
+    window.location.href = 'login.html'; 
+});
+    </script>
+</head>
+<body>
+    <header>
+        <h1>Company Management</h1>
+        <nav>
+            <a href="department.html">Department</a>
+            <a href="#" id="logout-button">Logout</a>
+            <a href="employee.html">Employee</a>
+            <a href="projects.html">Projects</a>
+        </nav>
+    </header>
+
+    <section>
+        <h2 id="welcomeMessage">Welcome to Company Management</h2>
+
+        <h3>Retrieve Companies</h3>
+        <table>
+            <thead>
+                <tr>
+                    <th>Company Name</th>
+                    <th>Number of Departments</th>
+                    <th>Number of Employees</th>
+                    <th>Number of Projects</th>
+                    <th>Created At</th>
+                </tr>
+            </thead>
+            <tbody id="CompanyList">
+               
+            </tbody>
+        </table>
+        <button onclick="fetchAllCompanies()">Retrieve All Companies</button>
+
+        <h3>Search for a Company</h3>
+        <label for="search_company_name">Enter Company Name:</label>
+        <input type="text" id="search_company_name" placeholder="Company Name">
+        <button onclick="fetchCompanyByName()">Retrieve Company</button>
+
+        <h4>Search Results</h4>
+        <table>
+            <thead>
+                <tr>
+                    <th>Company Name</th>
+                    <th>Number of Departments</th>
+                    <th>Number of Employees</th>
+                    <th>Number of Projects</th>
+                    <th>Created At</th>
+                </tr>
+            </thead>
+            <tbody id="company_table_body">
+               
+            </tbody>
+        </table>
+    </section>
+</body>
+</html>

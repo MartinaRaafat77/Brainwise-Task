@@ -1,0 +1,189 @@
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+
+body {
+    font-family: Arial, sans-serif;
+    background-color: #121212; 
+    color: #e0e0e0; 
+    line-height: 1.6;
+}
+
+header {
+    background-color: #333; 
+    padding: 20px;
+    text-align: center;
+}
+
+header h1 {
+    color: #ffffff;
+    margin-bottom: 10px;
+}
+
+nav a {
+    color: #00bcd4; 
+    text-decoration: none;
+    margin: 0 15px;
+    font-weight: bold;
+}
+
+nav a:hover {
+    color: #ffffff;
+}
+
+
+section {
+    padding: 20px;
+    margin: 20px;
+    background-color: #1e1e1e; 
+    border-radius: 8px;
+}
+
+table {
+    width: 100%;
+    margin-top: 20px;
+    border-collapse: collapse;
+}
+
+table th, table td {
+    padding: 12px;
+    text-align: left;
+}
+
+table th {
+    background-color: #333; 
+    color: #ffffff;
+}
+
+table tr:nth-child(even) {
+    background-color: #242424; 
+}
+
+table tr:hover {
+    background-color: #444;
+}
+
+table td button {
+    background-color: #00bcd4; 
+    color: #fff;
+    border: none;
+    padding: 8px 12px;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+table td button:hover {
+    background-color: #0288d1; 
+}
+
+
+input[type="text"], input[type="number"], input[type="email"], input[type="password"],input[type="date"],select, button, p, span {
+    width: 100%;
+    padding: 10px;
+    margin: 10px 0;
+    border: 1px solid #444;
+    background-color: #333;
+    color: #fff;
+    border-radius: 5px;
+    font-size: 16px;
+}
+
+input[type="text"]:focus, input[type="number"]:focus,input[type="password"]:focus,input[type="date"]:focus, select:focus, p, span {
+    outline: none;
+    border-color: #00bcd4;
+}
+
+button {
+    background-color: #00bcd4;
+    color: #fff;
+    border: none;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+    padding: 10px 20px;
+    font-size: 16px;
+    border-radius: 5px;
+}
+
+button:hover {
+    background-color: #0288d1;
+}
+
+
+section h2 {
+    font-size: 1.8rem;
+    color: #ffffff;
+    margin-bottom: 20px;
+}
+
+
+nav {
+    margin-top: 10px;
+}
+
+
+a {
+    color: #00bcd4; 
+    text-decoration: none;
+}
+
+a:hover {
+    color: #ffffff;
+    text-decoration: underline;
+}
+
+
+form {
+    margin-top: 20px;
+}
+
+form label {
+    display: block;
+    font-size: 1.1rem;
+    margin-bottom: 5px;
+    color: #e0e0e0;
+}
+
+
+@media (max-width: 768px) {
+    table th, table td {
+        font-size: 14px;
+        padding: 8px;
+    }
+
+    input[type="text"], input[type="number"], input[type="password"],input[type="date"],select, button {
+        font-size: 14px;
+    }
+}
+
+
+#employeeModal {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: #fff;
+    padding: 20px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    border-radius: 8px;
+    z-index: 1000;
+}
+
+#employeeModal form {
+    display: flex;
+    flex-direction: column;
+}
+
+#employeeModal form input,
+#employeeModal form select,
+#employeeModal form button {
+    margin: 10px 0;
+}
+
+body.modal-open {
+    overflow: hidden;
+}

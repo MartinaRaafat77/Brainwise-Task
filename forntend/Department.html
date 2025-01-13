@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Department Page</title>
+    <link rel="stylesheet" href="styles.css">
+    <script>
+        function fetchDepartments() {
+            fetch('http://localhost:5000/api/departments')
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error(`HTTP error! status: ${response.status}`);
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    const DepartmentList = document.getElementById('DepartmentList');
+                    DepartmentList.innerHTML = '';
+
+                    data.forEach(department => {
+                        const tr = document.createElement('tr');
+                        tr.innerHTML = `
+                            <td>${department.department_name}</td>
+                            <td>${department.no_ofemp}</td>
+                            <td>${department.no_ofproj}</td>
+                            <td>${department.company_name}</td>
+                        `;
+                        DepartmentList.appendChild(tr);
+                    });
+                })
+                .catch(error => {
+                    console.error('Error fetching departments:', error);
+                    alert('Error fetching departments. Please try again.');
+                });
+        }
+
+        function fetchdepartmentByName() {
+            const departmentName = document.getElementById('search_department_name').value.trim();
+
+            if (!departmentName) {
+                alert('Please enter a department name.');
+                return;
+            }
+
+            fetch(`http://localhost:5000/api/departments?department_name=${encodeURIComponent(departmentName)}`)
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error(`HTTP error! status: ${response.status}`);
+                    }
+                    return response.json();
+                })
+                .then(departments => {
+                    const departmentTableBody = document.getElementById('department_table_body');
+                    departmentTableBody.innerHTML = '';
+
+                    if (departments.length === 0) {
+                        alert('No departments found with the given name.');
+                        return;
+                    }
+
+                    departments.forEach(department => {
+                        const tr = document.createElement('tr');
+                        tr.innerHTML = `
+                            <td>${department.department_name}</td>
+                            <td>${department.no_ofemp}</td>
+                            <td>${department.no_ofproj}</td>
+                            <td>${department.company_name}</td>
+                        `;
+                        departmentTableBody.appendChild(tr);
+                    });
+                })
+                .catch(error => {
+                    console.error('Error fetching department:', error);
+                    alert('Error fetching department: ' + error.message);
+                });
+        }
+        
+document.getElementById('logout-button').addEventListener('click', function(event) {
+    event.preventDefault(); 
+    
+   
+    localStorage.clear(); 
+    sessionStorage.clear(); 
+
+    
+    window.location.href = 'login.html'; 
+});
+
+    </script>
+</head>
+<body onload="fetchDepartments()">
+    <header>
+        <h1>Department Management</h1>
+        <nav>
+            <a href="company.html">Company</a>
+            <a href="Login.html">User Accounts</a>
+            <a href="employee.html">Employee</a>
+            <a href="projects.html">Project</a>
+            <a href="#" id="logout-button">Logout</a>
+        </nav>
+    </header>
+
+    <section>
+        <h2>Retrieve Departments</h2>
+
+        <table>
+            <thead>
+                <tr>
+                    <th>Department Name</th>
+                    <th>Number of Employees</th>
+                    <th>Number of Projects</th>
+                    <th>Company Name</th>
+                </tr>
+            </thead>
+            <tbody id="DepartmentList">
+            </tbody>
+        </table>
+        <button onclick="fetchDepartments()">Retrieve All Departments</button>
+
+        <h3>Search for a Department</h3>
+        <label for="search_department_name">Enter Department Name:</label>
+        <input type="text" id="search_department_name" placeholder="Department Name">
+        <button onclick="fetchdepartmentByName()">Retrieve Department</button>
+
+        <table>
+            <thead>
+                <tr>
+                    <th>Department Name</th>
+                    <th>Number of Employees</th>
+                    <th>Number of Projects</th>
+                    <th>Company Name</th>
+                </tr>
+            </thead>
+            <tbody id="department_table_body">
+            </tbody>
+        </table>
+    </section>
+</body>
+</html>

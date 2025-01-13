@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Company Management System</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <header>
+        <h1>Company Management System</h1>
+        <nav>
+            <a href="company.html">Company</a>
+            <a href="department.html">Department</a>
+            <a href="employee.html">Employees</a>
+            <a href="project.html">Projects</a>
+            <a href="#" id="logout-button">Logout</a>
+        </nav>
+    </header>
+
+  
+    <div class="form-container">
+        <h2>Add New Project</h2>
+        <form id="project-form">
+            <input type="text" id="project_name" placeholder="Project Name" required>
+            <input type="text" id="description" placeholder="Description" required>
+            <input type="date" id="start_date" required>
+            <input type="date" id="end_date" required>
+            <input type="text" id="company_name" placeholder="Company Name" required>
+            <input type="text" id="department_name" placeholder="Department Name" required>
+            <button type="submit">Add Project</button>
+        </form>
+    </div>
+
+   
+    <div class="search-container">
+        <h2>Search Projects</h2>
+        <input type="text" id="search-project-name" placeholder="Search by Project Name">
+        <button id="search-project-button">Search</button>
+    </div>
+
+    
+    <h2>Project List</h2>
+    <table id="project-table">
+        <thead>
+            <tr>
+                <th>Project Name</th>
+                <th>Description</th>
+                <th>Start Date</th>
+                <th>End Date</th>
+                <th>Company Name</th>
+                <th>Department Name</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody id="project-list"></tbody>
+    </table>
+
+   
+    <div class="update-form-container" id="update-project-form-container">
+        <h2>Update Project</h2>
+        <form id="update-project-form">
+            <input type="text" id="update_project_name" placeholder="Project Name" required>
+            <input type="text" id="update_description" placeholder="Description" required>
+            <input type="date" id="update_start_date" required>
+            <input type="date" id="update_end_date" required>
+            <input type="text" id="update_company_name" placeholder="Company Name" required>
+            <input type="text" id="update_department_name" placeholder="Department Name" required>
+            <button type="submit">Update Project</button>
+        </form>
+    </div>
+
+    <script>
+        const API_URL = 'http://localhost:5000/api/projects'; 
+        let currentProjectId = null;
+
+       
+        document.getElementById('project-form').addEventListener('submit', function(event) {
+            event.preventDefault();
+
+            const projectData = {
+                project_name: document.getElementById('project_name').value,
+                description: document.getElementById('description').value,
+                start_date: document.getElementById('start_date').value,
+                end_date: document.getElementById('end_date').value,
+                company_name: document.getElementById('company_name').value,
+                department_name: document.getElementById('department_name').value
+            };
+
+            fetch(API_URL, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(projectData)
+            })
+            .then(response => response.json())
+            .then(data => {
+                alert(data.message);
+                loadProjects();
+            })
+            .catch(error => console.error('Error:', error));
+        });
+
+        // Search proj name
+        document.getElementById('search-project-button').addEventListener('click', function() {
+            const projectName = document.getElementById('search-project-name').value;
+            const searchUrl = projectName ? `${API_URL}?project_name=${projectName}` : API_URL;
+
+            fetch(searchUrl)
+                .then(response => response.json())
+                .then(projects => displayProjects(projects))
+                .catch(error => console.error('Error:', error));
+        });
+
+        
+        function loadProjects() {
+            fetch(API_URL)
+                .then(response => response.json())
+                .then(projects => displayProjects(projects))
+                .catch(error => console.error('Error:', error));
+        }
+
+        
+        function displayProjects(projects) {
+            const projectList = document.getElementById('project-list');
+            projectList.innerHTML = '';
+            projects.forEach(project => {
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td>${project.project_name}</td>
+                    <td>${project.description}</td>
+                    <td>${project.start_date}</td>
+                    <td>${project.end_date}</td>
+                    <td>${project.company_name}</td>
+                    <td>${project.department_name}</td>
+                    <td>
+                        <button onclick="deleteProject(${project.id})">Delete</button>
+                        <button onclick="editProject(${project.id})">Edit</button>
+                    </td>
+                `;
+                projectList.appendChild(tr);
+            });
+        }
+
+        
+        function deleteProject(id) {
+            fetch(`${API_URL}/${id}`, {
+                method: 'DELETE',
+            })
+            .then(response => response.json())
+            .then(data => {
+                alert(data.message);
+                loadProjects();
+            })
+            .catch(error => console.error('Error:', error));
+        }
+
+      
+        function editProject(id) {
+            fetch(`${API_URL}/${id}`)
+                .then(response => response.json())
+                .then(project => {
+                    currentProjectId = id;
+                    document.getElementById('update_project_name').value = project.project_name;
+                    document.getElementById('update_description').value = project.description;
+                    document.getElementById('update_start_date').value = project.start_date;
+                    document.getElementById('update_end_date').value = project.end_date;
+                    document.getElementById('update_company_name').value = project.company_name;
+                    document.getElementById('update_department_name').value = project.department_name;
+
+                   
+                    document.getElementById('update-project-form-container').style.display = 'block';
+                })
+                .catch(error => console.error('Error:', error));
+        }
+
+    
+        document.getElementById('update-project-form').addEventListener('submit', function(event) {
+            event.preventDefault();
+
+            const updatedData = {
+                project_name: document.getElementById('update_project_name').value,
+                description: document.getElementById('update_description').value,
+                start_date: document.getElementById('update_start_date').value,
+                end_date: document.getElementById('update_end_date').value,
+                company_name: document.getElementById('update_company_name').value,
+                department_name: document.getElementById('update_department_name').value
+            };
+
+            fetch(`${API_URL}/${currentProjectId}`, {
+                method: 'PATCH',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(updatedData)
+            })
+            .then(response => response.json())
+            .then(data => {
+                alert(data.message);
+                loadProjects();
+                document.getElementById('update-project-form-container').style.display = 'none';
+            })
+            .catch(error => console.error('Error:', error));
+        });
+
+        window.onload = loadProjects;
+        document.getElementById('logout-button').addEventListener('click', function(event) {
+    event.preventDefault(); 
+    
+    
+    localStorage.clear(); 
+    sessionStorage.clear();
+
+    
+    window.location.href = 'login.html'; 
+});
+    </script>
+</body>
+</html>
